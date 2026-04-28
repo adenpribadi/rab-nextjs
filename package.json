@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "npm run build && pm2 restart rab-erp || pm2 start npm --name rab-erp -- start"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
