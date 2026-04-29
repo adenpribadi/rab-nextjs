@@ -114,7 +114,7 @@ export default function ApprovalClient({
         <>
           {/* Bulk Actions */}
           {expenses.length > 0 && (
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '0.75rem 1rem', background: 'var(--bg-secondary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+            <div className="approval-bulk-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '0.75rem 1rem', background: 'var(--bg-secondary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
                 <input type="checkbox" checked={selected.size === expenses.length} onChange={toggleAll} />
                 Select All
@@ -136,7 +136,7 @@ export default function ApprovalClient({
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {expenses.map(e => (
-                <div key={e.id} className="glass-card" style={{
+                <div key={e.id} className="glass-card approval-card" style={{
                   padding: '1rem 1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start',
                   borderLeft: `4px solid #f59e0b`
                 }}>
@@ -156,8 +156,8 @@ export default function ApprovalClient({
                   )}
 
                   {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                  <div className="approval-card-info" style={{ flex: 1, minWidth: 0 }}>
+                    <div className="approval-info-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '1rem', color: '#f59e0b' }}>
                           Rp {e.amount.toLocaleString('id-ID')}
@@ -193,7 +193,7 @@ export default function ApprovalClient({
                   </div>
 
                   {/* Actions */}
-                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, alignItems: 'center' }}>
+                  <div className="approval-card-actions" style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, alignItems: 'center' }}>
                     <button
                       onClick={() => handleApprove(e.id)}
                       disabled={loading}
@@ -216,7 +216,7 @@ export default function ApprovalClient({
         </>
       ) : (
         /* History Tab */
-        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="glass-card history-table-container" style={{ padding: 0, overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '2px solid var(--border-color)' }}>
               <tr>

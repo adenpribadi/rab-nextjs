@@ -192,7 +192,14 @@ export function Topbar() {
 
   return (
     <header className="topbar-header" style={{ height: '3.5rem', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', padding: '0 1.5rem', gap: '1rem', justifyContent: 'flex-end', flexShrink: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.3rem 0.75rem', flex: '0 1 220px' }}>
+      <div className="mobile-logo" style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+        </div>
+        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>RAB Pro</span>
+      </div>
+
+      <div className="topbar-search" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.3rem 0.75rem', flex: '0 1 220px' }}>
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--text-muted)' }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>

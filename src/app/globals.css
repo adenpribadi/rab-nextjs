@@ -321,38 +321,79 @@ button {
   }
   
   .sidebar-nav {
-    flex-direction: row;
-    padding: 0;
-    align-items: center;
-    justify-content: space-around;
+    flex-direction: row !important;
+    padding: 0 0.75rem !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 0.4rem !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
-  
+
   .sidebar-link {
     flex-direction: column;
-    padding: 0.5rem;
-    gap: 0.25rem;
-    font-size: 0.7rem;
-    border-left: none;
-    border-bottom: 3px solid transparent;
+    padding: 0.6rem 0.5rem !important;
+    gap: 0.2rem !important;
+    font-size: 0.7rem !important;
+    border-left: none !important;
+    border-bottom: 3.5px solid transparent;
     border-radius: 0;
+    min-width: 72px;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--text-muted) !important;
   }
   
   .sidebar-link.active {
-    background: linear-gradient(0deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 100%);
-    border-left-color: transparent;
-    border-bottom-color: var(--accent-primary);
+    background: linear-gradient(0deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0) 100%) !important;
+    border-bottom-color: var(--accent-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Badge fix for mobile */
+  .sidebar-link span[style*="position: 'absolute'"] {
+    right: 15% !important;
+    top: 5px !important;
+    transform: scale(0.9);
   }
 
   .sidebar-link:hover {
-    transform: translateY(-2px);
+    transform: none;
   }
   
   .topbar-header {
+    height: 3.5rem !important;
     padding: 0 1rem;
+    justify-content: space-between !important;
   }
   
-  .topbar-search, .topbar-user {
+  .topbar-search {
     display: none !important;
+  }
+
+  .topbar-user {
+    display: flex !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    gap: 0 !important;
+  }
+
+  .topbar-user > div:first-child {
+    display: none !important; /* Hide name and role on mobile */
+  }
+
+  .topbar-user > div:last-child {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .mobile-logo {
+    display: flex !important;
   }
 
   .metrics-grid {
@@ -378,33 +419,204 @@ button {
   
   .page-header {
     flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 1rem;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
   }
-  
-  .scrollable-main {
+
+  .page-header > div:first-child {
+    text-align: left;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem !important;
+  }
+
+  .page-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Filter bar responsiveness */
+  .responsive-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
     padding: 1rem !important;
+    gap: 0.75rem !important;
   }
-  
-  .responsive-form-layout {
-    grid-template-columns: 1fr !important;
+
+  .filter-inputs {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
   }
-  
-  .mobile-header-wrap {
-    flex-wrap: wrap !important;
-    gap: 0.5rem;
+
+  .filter-inputs input, .filter-inputs select {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .filter-inputs button {
+    width: 100%;
   }
   
   .responsive-inline-form {
     flex-direction: column !important;
+    gap: 0.75rem !important;
   }
-  .responsive-inline-form > div {
+  .responsive-inline-form .form-group-item {
     width: 100% !important;
     flex: none !important;
   }
   .responsive-inline-form button {
+    width: 100% !important;
+    margin-top: 0.25rem !important;
+    height: 40px !important;
+  }
+
+  /* Approval Page Responsive Fixes */
+  .approval-bulk-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .approval-card {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    position: relative;
+  }
+
+  .approval-card input[type="checkbox"] {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    margin: 0 !important;
+  }
+
+  .approval-card-info {
     width: 100%;
+  }
+
+  .approval-info-header {
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+  }
+
+  .approval-info-header > div:last-child {
+    text-align: left !important;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.5rem;
+    margin-top: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .approval-card-actions {
+    width: 100%;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    justify-content: stretch !important;
+  }
+
+  .approval-card-actions button {
+    flex: 1;
+  }
+
+  .history-table-container {
+    overflow-x: auto !important;
+  }
+
+  .history-table-container table {
+    min-width: 600px;
+  }
+
+  /* Specific Approval Header Fixes */
+  .approval-header {
+    gap: 0.5rem !important;
+  }
+
+  .approval-header h1 {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .pending-badge {
+    margin-left: auto;
+  }
+
+  .approval-summary-card {
+    width: 100% !important;
+    text-align: left !important;
+    min-width: auto !important;
     margin-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .approval-summary-card > div:last-child {
+    font-size: 1.1rem !important;
+  }
+
+  /* Responsive Table to Cards Transformation */
+  .responsive-table thead {
+    display: none !important;
+  }
+
+  .responsive-table tr {
+    display: block !important;
+    border: 1px solid var(--border-color) !important;
+    margin: 0 1rem 1rem !important;
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-secondary) !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .responsive-table td {
+    display: block !important;
+    text-align: left !important;
+    padding: 0.4rem 0 !important;
+    border: none !important;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-muted);
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.15rem;
+  }
+
+  .responsive-table td[data-label="#"] {
+    display: none !important;
+  }
+
+  .responsive-table td[data-label="Material / Wage Name"] {
+    font-size: 1rem !important;
+    padding-top: 0 !important;
+  }
+
+  .table-actions-mobile {
+    justify-content: flex-start !important;
+    gap: 1.5rem !important;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem !important;
+    margin-top: 0.5rem;
+  }
+
+  .mobile-only-text {
+    display: inline !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .table-responsive-wrapper {
+    overflow: visible !important;
   }
 }
 

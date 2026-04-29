@@ -44,8 +44,8 @@ export default async function ProjectsPage({
       </header>
 
       <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-        <form method="GET" action="/projects" style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+        <form method="GET" action="/projects" className="responsive-filter-bar" style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="filter-inputs" style={{ display: 'flex', gap: '1rem' }}>
             <input 
               type="text" 
               name="search"

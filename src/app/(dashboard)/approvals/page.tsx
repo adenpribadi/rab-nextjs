@@ -68,12 +68,12 @@ export default async function ApprovalsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <header className="page-header approval-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <h1 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             Expense Approvals
             {pendingCount > 0 && (
-              <span style={{ fontSize: '0.75rem', background: '#ef4444', color: 'white', padding: '0.15rem 0.5rem', borderRadius: '99px', fontWeight: 700 }}>
+              <span className="pending-badge" style={{ fontSize: '0.75rem', background: '#ef4444', color: 'white', padding: '0.15rem 0.5rem', borderRadius: '99px', fontWeight: 700 }}>
                 {pendingCount} Pending
               </span>
             )}
@@ -83,7 +83,7 @@ export default async function ApprovalsPage() {
           </p>
         </div>
         {totalPendingValue > 0 && (
-          <div style={{ textAlign: 'right', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', padding: '0.75rem 1.25rem' }}>
+          <div className="approval-summary-card" style={{ textAlign: 'right', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', padding: '0.75rem 1.25rem', minWidth: '180px' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Total Pending Value</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f59e0b' }}>Rp {totalPendingValue.toLocaleString('id-ID')}</div>
           </div>
