@@ -2,7 +2,7 @@
 
 Sistem manajemen proyek dan penyusunan Rencana Anggaran Biaya (RAB) yang komprehensif, dirancang untuk efisiensi operasional dan transparansi keuangan proyek Anda.
 
-![Dashboard Preview](public/dashboard-preview.png) *(Opsional: Silakan tambahkan screenshot dashboard di sini)*
+![Dashboard Preview](public/dashboard-preview.png)
 
 ## ✨ Keunggulan Utama
 
