@@ -7,6 +7,7 @@ import ExportButtons from '@/components/ExportButtons'
 import CostItemFormModal from '@/components/CostItemFormModal'
 import ExpenseFormModal from '@/components/ExpenseFormModal'
 import DeleteCostItemButton from '@/components/DeleteCostItemButton'
+import VariationOrderSection from '@/components/VariationOrderSection'
 
 export default async function ProjectDetails({
   params,
@@ -37,6 +38,16 @@ export default async function ProjectDetails({
         },
         orderBy: {
           categoryId: 'asc'
+        }
+      },
+      variationOrders: {
+        include: {
+          items: {
+            include: { category: true }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
       }
     }
@@ -77,9 +88,15 @@ export default async function ProjectDetails({
   }, 0)
   
   const budget = Number(project.budget)
-  const isEstimateOverBudget = estimateTotal > budget
-  const budgetPercentage = budget > 0 ? Math.min((estimateTotal / budget) * 100, 100) : 0
-  const realizationPercentage = estimateTotal > 0 ? Math.min((realizedTotal / estimateTotal) * 100, 100) : 0
+  
+  // Variation Order Calculations
+  const approvedVOs = project.variationOrders.filter(vo => vo.status === 'APPROVED')
+  const voTotal = approvedVOs.reduce((sum, vo) => sum + Number(vo.totalAmount), 0)
+  const currentContractValue = estimateTotal + voTotal
+
+  const isEstimateOverBudget = currentContractValue > budget
+  const budgetPercentage = budget > 0 ? Math.min((currentContractValue / budget) * 100, 100) : 0
+  const realizationPercentage = currentContractValue > 0 ? Math.min((realizedTotal / currentContractValue) * 100, 100) : 0
   
   const rawItemToEdit = editItemId ? project.items.find(i => i.id === editItemId) : null;
   const itemToEdit = rawItemToEdit ? {
@@ -106,6 +123,30 @@ export default async function ProjectDetails({
       receiptImageUrl: exp.receiptImageUrl
     }))
   } : null;
+
+  const projectToPass = {
+    ...project,
+    items: project.items.map(item => ({
+      ...item,
+      quantity: Number(item.quantity),
+      unitPrice: Number(item.unitPrice),
+      totalPrice: Number(item.totalPrice),
+      actualProgress: Number(item.actualProgress),
+      actualVolume: Number(item.actualVolume)
+    })),
+    variationOrders: project.variationOrders.map(vo => ({
+      ...vo,
+      totalAmount: Number(vo.totalAmount),
+      items: vo.items.map(item => ({
+        ...item,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        actualProgress: Number(item.actualProgress),
+        actualVolume: Number(item.actualVolume)
+      }))
+    }))
+  };
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '100%' }}>
@@ -191,14 +232,18 @@ export default async function ProjectDetails({
         {/* Financial Summary */}
         <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Budget Ceiling</span>
-            <span style={{ fontWeight: 600 }}>Rp {budget.toLocaleString('id-ID')}</span>
+            <span style={{ color: 'var(--text-muted)' }}>Original RAB</span>
+            <span style={{ fontWeight: 600 }}>Rp {estimateTotal.toLocaleString('id-ID')}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>RAB Estimate</span>
-            <span style={{ fontWeight: 700, color: isEstimateOverBudget ? 'var(--error)' : 'inherit' }}>Rp {estimateTotal.toLocaleString('id-ID')}</span>
+            <span style={{ color: 'var(--text-muted)' }}>Addendum / VO</span>
+            <span style={{ fontWeight: 600, color: 'var(--success)' }}>+ Rp {voTotal.toLocaleString('id-ID')}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Current Contract Value</span>
+            <span style={{ fontWeight: 700, color: isEstimateOverBudget ? 'var(--error)' : 'inherit' }}>Rp {currentContractValue.toLocaleString('id-ID')}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.85rem' }}>
             <span style={{ color: 'var(--text-muted)' }}>Financial Realization</span>
             <span style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>Rp {realizedTotal.toLocaleString('id-ID')}</span>
           </div>
@@ -212,22 +257,37 @@ export default async function ProjectDetails({
             }}></div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            <span>Realization vs Estimate</span>
+            <span>Realization vs Contract</span>
             <span>{realizationPercentage.toFixed(1)}%</span>
           </div>
 
           {/* Physical Progress */}
           {(() => {
             const totalItems = project.items.length;
-            if (totalItems === 0) return null;
-            const weightedSum = project.items.reduce((sum, item) => sum + (Number(item.actualProgress) / 100 * Number(item.totalPrice)), 0);
-            const totalEstimate = project.items.reduce((sum, item) => sum + Number(item.totalPrice), 0) || 1;
-            const physicalProgress = (weightedSum / totalEstimate) * 100;
+            const approvedVOs = project.variationOrders.filter(vo => vo.status === 'APPROVED');
+            const totalVOItemsCount = approvedVOs.reduce((sum, vo) => sum + vo.items.length, 0);
+            
+            if (totalItems === 0 && totalVOItemsCount === 0) return null;
+
+            // Weighted progress from Original Items
+            const itemWeightedSum = project.items.reduce((sum, item) => sum + (Number(item.actualProgress) / 100 * Number(item.totalPrice)), 0);
+            const itemTotalEstimate = project.items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+
+            // Weighted progress from VO Items
+            const voWeightedSum = approvedVOs.reduce((sum, vo) => {
+              return sum + vo.items.reduce((iSum, item) => iSum + (Number(item.actualProgress) / 100 * Number(item.totalPrice)), 0);
+            }, 0);
+            const voTotalEstimate = approvedVOs.reduce((sum, vo) => sum + Number(vo.totalAmount), 0);
+
+            const totalWeightedSum = itemWeightedSum + voWeightedSum;
+            const overallTotalEstimate = itemTotalEstimate + voTotalEstimate || 1;
+            
+            const physicalProgress = (totalWeightedSum / overallTotalEstimate) * 100;
             
             return (
               <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Physical Completion</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Overall Physical Completion</span>
                   <span style={{ fontWeight: 700, color: 'var(--success)' }}>{physicalProgress.toFixed(1)}%</span>
                 </div>
                 <div style={{ height: '8px', background: 'var(--bg-tertiary)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
@@ -237,6 +297,9 @@ export default async function ProjectDetails({
                     background: 'var(--success)',
                     transition: 'width 0.3s ease'
                   }}></div>
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem', textAlign: 'right' }}>
+                  (Original RAB + Approved Addendum)
                 </div>
               </div>
             );
@@ -267,7 +330,9 @@ export default async function ProjectDetails({
               estimateTotal={estimateTotal} 
               realizedTotal={realizedTotal}
             />
-            <Link href={`/projects/${project.id}?addItem=true`} className="btn-primary no-print" style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>+ Add Item</Link>
+            {project.status === 'PLANNING' && (
+              <Link href={`/projects/${project.id}?addItem=true`} className="btn-primary no-print" style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>+ Add Item</Link>
+            )}
           </div>
         </div>
 
@@ -320,35 +385,59 @@ export default async function ProjectDetails({
                         {itemRealized > 0 ? itemRealized.toLocaleString('id-ID') : '-'}
                       </td>
                       <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
-                        <Link href="/progress" title="Update Progress" style={{ textDecoration: 'none' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center' }}>
-                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>
+                        {project.status === 'PLANNING' ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center', opacity: 0.5, cursor: 'not-allowed' }} title="Start project to update progress">
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
                               {Number(item.actualProgress).toFixed(1)}%
                             </div>
                             <div style={{ width: '60px', height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${item.actualProgress}%`, height: '100%', background: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--accent-primary)' }}></div>
+                              <div style={{ width: `${item.actualProgress}%`, height: '100%', background: 'var(--text-muted)' }}></div>
                             </div>
                           </div>
-                        </Link>
+                        ) : (
+                          <Link href="/progress" title="Update Progress" style={{ textDecoration: 'none' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center' }}>
+                              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>
+                                {Number(item.actualProgress).toFixed(1)}%
+                              </div>
+                              <div style={{ width: '60px', height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ width: `${item.actualProgress}%`, height: '100%', background: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--accent-primary)' }}></div>
+                              </div>
+                            </div>
+                          </Link>
+                        )}
                       </td>
                       <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                          <Link href={`/projects/${project.id}?expenseItem=${item.id}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.8rem' }} title="Input/View Realization">
-                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                          </Link>
-                          <Link href={`/projects/${project.id}?editItem=${item.id}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.8rem' }} title="Edit">
-                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </Link>
-                          <form action={deleteCostItem}>
-                            <input type="hidden" name="id" value={item.id} />
-                            <input type="hidden" name="projectId" value={project.id} />
-                            <DeleteCostItemButton />
-                          </form>
+                          {project.status === 'PLANNING' ? (
+                            <div style={{ color: 'var(--text-muted)', opacity: 0.3, cursor: 'not-allowed' }} title="Start project to input expenses">
+                              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <Link href={`/projects/${project.id}?expenseItem=${item.id}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.8rem' }} title="Input/View Realization">
+                              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                              </svg>
+                            </Link>
+                          )}
+                          {project.status === 'PLANNING' && (
+                            <>
+                              <Link href={`/projects/${project.id}?editItem=${item.id}`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.8rem' }} title="Edit">
+                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </Link>
+                              <form action={deleteCostItem}>
+                                <input type="hidden" name="id" value={item.id} />
+                                <input type="hidden" name="projectId" value={project.id} />
+                                <DeleteCostItemButton />
+                              </form>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -395,6 +484,15 @@ export default async function ProjectDetails({
           suppliers={suppliers}
           action={addExpense}
           deleteAction={deleteExpense}
+        />
+      )}
+
+      {/* Variation Orders Section - Only show when project is in execution */}
+      {project.status !== 'PLANNING' && (
+        <VariationOrderSection 
+          projectId={project.id}
+          variationOrders={projectToPass.variationOrders}
+          categories={categories}
         />
       )}
     </div>

@@ -121,132 +121,169 @@ export default function ProgressClient({ projects }: { projects: any[] }) {
               <Link href={`/projects/${selectedProject.id}`} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>View Full RAB</Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-              {selectedProject.items.map((item: any) => (
-                <div key={item.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{item.category.name}</div>
-                    <h4 style={{ fontSize: '1rem', margin: 0, fontWeight: 600 }}>{item.name}</h4>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{item.quantity} {item.unit}</div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Item Progress</span>
-                      <span style={{ fontWeight: 700, color: item.actualProgress >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>{Number(item.actualProgress).toFixed(1)}%</span>
-                    </div>
-                    <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{ width: `${item.actualProgress}%`, height: '100%', background: 'var(--accent-primary)', transition: 'width 0.5s ease' }}></div>
-                    </div>
-                  </div>
-
-                  {updatingId === item.id ? (
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                      <input type="hidden" name="costItemId" value={item.id} />
-                      <input type="hidden" name="updateType" value={updateMode} />
-                      <input type="hidden" name="targetVolume" value={item.quantity} />
-
-                      {/* Mode Toggle */}
-                      <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderRadius: '6px', padding: '2px' }}>
-                        <button 
-                          type="button" 
-                          onClick={() => setUpdateMode('simple')} 
-                          style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'simple' ? 'var(--accent-primary)' : 'transparent', color: updateMode === 'simple' ? 'white' : 'var(--text-muted)' }}
-                        >Simple (%)</button>
-                        <button 
-                          type="button" 
-                          onClick={() => setUpdateMode('detailed')} 
-                          style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'detailed' ? 'var(--accent-primary)' : 'transparent', color: updateMode === 'detailed' ? 'white' : 'var(--text-muted)' }}
-                        >Detailed (Vol)</button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {/* Original Items Section */}
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Original RAB Items
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                  {selectedProject.items.filter((item: any) => !item.isVO).map((item: any) => (
+                    <div key={item.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--accent-primary)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{item.category.name}</div>
+                        <h4 style={{ fontSize: '1rem', margin: 0, fontWeight: 600 }}>{item.name}</h4>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{item.quantity} {item.unit}</div>
                       </div>
 
-                      {updateMode === 'simple' ? (
-                        <div>
-                          <label className="input-label" style={{ fontSize: '0.75rem' }}>Completion (%)</label>
-                          <input 
-                            type="number" 
-                            name="percentage" 
-                            defaultValue={Number(item.actualProgress)} 
-                            min="0" max="100" step="0.1" 
-                            className="input-field" 
-                            required 
-                          />
+                      {/* Progress Bar */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Item Progress</span>
+                          <span style={{ fontWeight: 700, color: item.actualProgress >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>{Number(item.actualProgress).toFixed(1)}%</span>
                         </div>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target: <b>{item.quantity} {item.unit}</b></div>
-                           <div>
-                            <label className="input-label" style={{ fontSize: '0.75rem' }}>Cumulative Volume ({item.unit})</label>
-                            <input 
-                              type="number" 
-                              name="volume" 
-                              defaultValue={Number(item.actualVolume) || 0} 
-                              max={item.quantity}
-                              step="0.01" 
-                              className="input-field" 
-                              required 
-                            />
+                        <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ width: `${item.actualProgress}%`, height: '100%', background: 'var(--accent-primary)', transition: 'width 0.5s ease' }}></div>
+                        </div>
+                      </div>
+
+                      {updatingId === item.id ? (
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                          <input type="hidden" name={item.isVO ? "voItemId" : "costItemId"} value={item.id} />
+                          <input type="hidden" name="updateType" value={updateMode} />
+                          <input type="hidden" name="targetVolume" value={item.quantity} />
+                          
+                          <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderRadius: '6px', padding: '2px' }}>
+                            <button type="button" onClick={() => setUpdateMode('simple')} style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'simple' ? 'var(--accent-primary)' : 'transparent', color: updateMode === 'simple' ? 'white' : 'var(--text-muted)' }}>Simple (%)</button>
+                            <button type="button" onClick={() => setUpdateMode('detailed')} style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'detailed' ? 'var(--accent-primary)' : 'transparent', color: updateMode === 'detailed' ? 'white' : 'var(--text-muted)' }}>Detailed (Vol)</button>
                           </div>
+
+                          {updateMode === 'simple' ? (
+                            <div>
+                              <label className="input-label" style={{ fontSize: '0.75rem' }}>Completion (%)</label>
+                              <input type="number" name="percentage" defaultValue={Number(item.actualProgress)} min="0" max="100" step="0.1" className="input-field" required />
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target: <b>{item.quantity} {item.unit}</b></div>
+                              <input type="number" name="volume" defaultValue={Number(item.actualVolume) || 0} max={item.quantity} step="0.01" className="input-field" required />
+                            </div>
+                          )}
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                            <select name="weather" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }}>
+                              <option value="Sunny">☀️ Sunny</option>
+                              <option value="Cloudy">☁️ Cloudy</option>
+                              <option value="Rainy">🌧️ Rainy</option>
+                            </select>
+                            <input type="text" name="staffName" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }} placeholder="Mandor" />
+                          </div>
+
+                          <textarea name="description" className="input-field" placeholder="Notes..." rows={2} style={{ fontSize: '0.8rem' }}></textarea>
+                          
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button type="button" onClick={() => setUpdatingId(null)} className="btn-secondary" style={{ flex: 1, padding: '0.4rem' }}>Cancel</button>
+                            <button type="submit" disabled={loading} className="btn-primary" style={{ flex: 1, padding: '0.4rem' }}>{loading ? 'Saving...' : 'Save'}</button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button onClick={() => setUpdatingId(item.id)} className="btn-primary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}>Update</button>
+                          <button onClick={() => setViewingHistoryId(item.id)} className="btn-secondary" style={{ padding: '0.5rem' }} title="View History">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </button>
                         </div>
                       )}
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                        <div>
-                          <label className="input-label" style={{ fontSize: '0.75rem' }}>Weather</label>
-                          <select name="weather" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }}>
-                            <option value="Sunny">☀️ Sunny</option>
-                            <option value="Cloudy">☁️ Cloudy</option>
-                            <option value="Rainy">🌧️ Rainy</option>
-                            <option value="Stormy">⛈️ Stormy</option>
-                          </select>
-                        </div>
-                        <div>
-                           <label className="input-label" style={{ fontSize: '0.75rem' }}>Staff Name</label>
-                           <input type="text" name="staffName" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }} placeholder="Mandor Name" />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="input-label" style={{ fontSize: '0.75rem' }}>Notes / Documentation Link</label>
-                        <textarea 
-                          name="description" 
-                          className="input-field" 
-                          placeholder="Activities, challenges, or photo link..." 
-                          rows={2}
-                          style={{ fontSize: '0.8rem' }}
-                        ></textarea>
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button type="button" onClick={() => setUpdatingId(null)} className="btn-secondary" style={{ flex: 1, padding: '0.4rem' }}>Cancel</button>
-                        <button type="submit" disabled={loading} className="btn-primary" style={{ flex: 1, padding: '0.4rem' }}>
-                          {loading ? 'Saving...' : 'Save Update'}
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button 
-                        onClick={() => setUpdatingId(item.id)} 
-                        className="btn-primary" 
-                        style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
-                      >
-                        Update
-                      </button>
-                      <button 
-                        onClick={() => setViewingHistoryId(item.id)} 
-                        className="btn-secondary" 
-                        style={{ padding: '0.5rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        title="View History"
-                      >
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* VO Items Section */}
+              {selectedProject.items.some((item: any) => item.isVO) && (
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem', color: 'var(--warning)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Approved Variation Orders
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                    {selectedProject.items.filter((item: any) => item.isVO).map((item: any) => (
+                      <div key={item.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', borderLeft: '4px solid var(--warning)' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--warning)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>VO: {item.category.name}</div>
+                          <h4 style={{ fontSize: '1rem', margin: 0, fontWeight: 600 }}>{item.name.replace('(VO) ', '')}</h4>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{item.quantity} {item.unit}</div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+                            <span style={{ color: 'var(--text-muted)' }}>VO Progress</span>
+                            <span style={{ fontWeight: 700, color: item.actualProgress >= 100 ? 'var(--success)' : 'var(--warning)' }}>{Number(item.actualProgress).toFixed(1)}%</span>
+                          </div>
+                          <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: `${item.actualProgress}%`, height: '100%', background: 'var(--warning)', transition: 'width 0.5s ease' }}></div>
+                          </div>
+                        </div>
+
+                        {updatingId === item.id ? (
+                          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <input type="hidden" name={item.isVO ? "voItemId" : "costItemId"} value={item.id} />
+                            <input type="hidden" name="updateType" value={updateMode} />
+                            <input type="hidden" name="targetVolume" value={item.quantity} />
+                            
+                            <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderRadius: '6px', padding: '2px' }}>
+                              <button type="button" onClick={() => setUpdateMode('simple')} style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'simple' ? 'var(--warning)' : 'transparent', color: updateMode === 'simple' ? 'black' : 'var(--text-muted)' }}>Simple (%)</button>
+                              <button type="button" onClick={() => setUpdateMode('detailed')} style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', background: updateMode === 'detailed' ? 'var(--warning)' : 'transparent', color: updateMode === 'detailed' ? 'black' : 'var(--text-muted)' }}>Detailed (Vol)</button>
+                            </div>
+
+                            {updateMode === 'simple' ? (
+                              <div>
+                                <label className="input-label" style={{ fontSize: '0.75rem' }}>Completion (%)</label>
+                                <input type="number" name="percentage" defaultValue={Number(item.actualProgress)} min="0" max="100" step="0.1" className="input-field" required />
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target: <b>{item.quantity} {item.unit}</b></div>
+                                <input type="number" name="volume" defaultValue={Number(item.actualVolume) || 0} max={item.quantity} step="0.01" className="input-field" required />
+                              </div>
+                            )}
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                              <select name="weather" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }}>
+                                <option value="Sunny">☀️ Sunny</option>
+                                <option value="Cloudy">☁️ Cloudy</option>
+                                <option value="Rainy">🌧️ Rainy</option>
+                              </select>
+                              <input type="text" name="staffName" className="input-field" style={{ padding: '0.4rem', fontSize: '0.8rem' }} placeholder="Mandor" />
+                            </div>
+
+                            <textarea name="description" className="input-field" placeholder="Notes..." rows={2} style={{ fontSize: '0.8rem' }}></textarea>
+                            
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <button type="button" onClick={() => setUpdatingId(null)} className="btn-secondary" style={{ flex: 1, padding: '0.4rem' }}>Cancel</button>
+                              <button type="submit" disabled={loading} className="btn-primary" style={{ flex: 1, padding: '0.4rem', background: 'var(--warning)', color: 'black' }}>{loading ? 'Saving...' : 'Save Update'}</button>
+                            </div>
+                          </form>
+                        ) : (
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button onClick={() => setUpdatingId(item.id)} className="btn-primary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem', background: 'var(--warning)', color: 'black' }}>Update VO</button>
+                            <button onClick={() => setViewingHistoryId(item.id)} className="btn-secondary" style={{ padding: '0.5rem' }} title="View History">
+                              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

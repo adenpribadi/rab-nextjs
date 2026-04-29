@@ -36,8 +36,28 @@ Aplikasi ini mencakup modul-modul penting untuk operasional bisnis:
 4.  **Kontrol Inventori**: Katalog material, satuan unit, dan log pergerakan stok.
 5.  **Sistem Pengeluaran & Kas**: Pencatatan biaya harian lengkap dengan upload bukti fisik.
 6.  **Approval System**: Antarmuka khusus untuk admin/manajer menyetujui atau menolak klaim biaya.
-7.  **Database Relasional**: Manajemen Klien dan Supplier (Vendor) yang terorganisir.
-8.  **Timeline Proyek**: Visualisasi jadwal pelaksanaan proyek.
+7.  **Variation Order (VO) / Addendum**: Modul khusus untuk menangani perubahan atau tambahan pekerjaan setelah proyek berjalan, lengkap dengan sistem persetujuan (Approval).
+8.  **Laporan Progres Fisik**: Pemantauan persentase penyelesaian pekerjaan di lapangan secara real-time.
+9.  **Database Relasional**: Manajemen Klien dan Supplier (Vendor) yang terorganisir.
+10. **Timeline Proyek**: Visualisasi jadwal pelaksanaan proyek.
+
+## 🏗️ Project Lifecycle Workflow
+
+Sistem ini menerapkan aturan bisnis yang ketat untuk menjaga integritas data berdasarkan status proyek:
+
+### 1. Fase PLANNING (Perencanaan)
+*   **Fungsi**: Penyusunan draf RAB utama dan penentuan Budget Ceiling.
+*   **Fitur Aktif**: Bebas menambah, mengedit, atau menghapus item RAB.
+*   **Keamanan**: Fitur **Input Pengeluaran** dan **Update Progres** dikunci untuk mencegah kebocoran data sebelum proyek resmi dimulai.
+
+### 2. Fase IN PROGRESS (Pelaksanaan)
+*   **Fungsi**: Masa konstruksi dan monitoring biaya berjalan.
+*   **Fitur Aktif**: Input kuitansi pengeluaran aktual dan update progres fisik harian.
+*   **Keamanan**: **RAB Utama dikunci total** (tidak bisa diedit/hapus). Setiap tambahan pekerjaan harus melalui jalur **Variation Order (VO)** untuk menjaga audit trail yang jelas.
+
+### 3. Fase COMPLETED (Selesai)
+*   **Fungsi**: Serah terima dan evaluasi margin proyek.
+*   **Fitur**: Seluruh data dikunci secara permanen untuk arsip finansial.
 
 ## ⚙️ Persiapan & Instalasi
 

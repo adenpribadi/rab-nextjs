@@ -11,7 +11,7 @@ export default async function ProgressPage() {
 
   const projects = await prisma.project.findMany({
     where: {
-      status: { in: ['IN_PROGRESS', 'PLANNING'] } // Allow tracking for ongoing or about to start projects
+      status: 'IN_PROGRESS'
     },
     include: {
       items: {
@@ -25,6 +25,20 @@ export default async function ProgressPage() {
         orderBy: {
           categoryId: 'asc'
         }
+      },
+      variationOrders: {
+        where: { status: 'APPROVED' },
+        include: {
+          items: {
+            include: {
+              category: true,
+              progressUpdates: {
+                orderBy: { updateDate: 'desc' },
+                take: 5
+              }
+            }
+          }
+        }
       }
     },
     orderBy: {
@@ -34,22 +48,57 @@ export default async function ProgressPage() {
 
   // Serialize Decimal for Client Component
   const serializedProjects = projects.map(p => ({
-    ...p,
+    id: p.id,
+    name: p.name,
+    clientName: p.clientName,
     budget: Number(p.budget),
-    items: p.items.map(item => ({
-      ...item,
-      quantity: Number(item.quantity),
-      unitPrice: Number(item.unitPrice),
-      totalPrice: Number(item.totalPrice),
-      actualProgress: Number(item.actualProgress),
-      actualVolume: Number(item.actualVolume),
-      progressUpdates: item.progressUpdates.map((up: any) => ({
-        ...up,
-        percentage: Number(up.percentage),
-        volume: up.volume ? Number(up.volume) : null,
-        staffName: up.staffName
-      }))
-    }))
+    items: [
+      ...p.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        categoryId: item.categoryId,
+        category: { name: item.category.name },
+        unit: item.unit,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        actualProgress: Number(item.actualProgress),
+        actualVolume: Number(item.actualVolume),
+        isVO: false,
+        progressUpdates: item.progressUpdates.map((up: any) => ({
+          id: up.id,
+          percentage: Number(up.percentage),
+          volume: up.volume ? Number(up.volume) : null,
+          staffName: up.staffName,
+          updateDate: up.updateDate.toISOString(),
+          description: up.description,
+          updatedBy: up.updatedBy
+        }))
+      })),
+      ...p.variationOrders.flatMap(vo => vo.items.map(item => ({
+        id: item.id,
+        name: `(VO) ${item.name}`,
+        categoryId: item.categoryId,
+        category: { name: item.category.name },
+        unit: item.unit,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        actualProgress: Number(item.actualProgress),
+        actualVolume: Number(item.actualVolume),
+        isVO: true,
+        voId: vo.id,
+        progressUpdates: item.progressUpdates.map((up: any) => ({
+          id: up.id,
+          percentage: Number(up.percentage),
+          volume: up.volume ? Number(up.volume) : null,
+          staffName: up.staffName,
+          updateDate: up.updateDate.toISOString(),
+          description: up.description,
+          updatedBy: up.updatedBy
+        }))
+      })))
+    ].sort((a, b) => a.categoryId - b.categoryId)
   }))
 
   return (

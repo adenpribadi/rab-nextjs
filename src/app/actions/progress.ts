@@ -8,7 +8,11 @@ export async function updateProgress(formData: FormData) {
   const session = await auth()
   if (!session) throw new Error("Unauthorized")
 
-  const costItemId = parseInt(formData.get('costItemId') as string)
+  const costItemIdRaw = formData.get('costItemId')
+  const voItemIdRaw = formData.get('voItemId')
+  const costItemId = costItemIdRaw ? parseInt(costItemIdRaw as string) : null
+  const voItemId = voItemIdRaw ? parseInt(voItemIdRaw as string) : null
+  
   const description = formData.get('description') as string
   const imageUrl = formData.get('imageUrl') as string || null
   const weather = formData.get('weather') as string || null
@@ -32,17 +36,29 @@ export async function updateProgress(formData: FormData) {
   }
 
   // Use a transaction to update the current progress and create a history record
-  await prisma.$transaction([
-    prisma.costItem.update({
-      where: { id: costItemId },
-      data: { 
-        actualProgress: percentage,
-        actualVolume: volume || undefined 
-      }
-    }),
-    prisma.progressUpdate.create({
+  await prisma.$transaction(async (tx) => {
+    if (costItemId) {
+      await tx.costItem.update({
+        where: { id: costItemId },
+        data: { 
+          actualProgress: percentage,
+          actualVolume: volume || undefined 
+        }
+      })
+    } else if (voItemId) {
+      await tx.vOItem.update({
+        where: { id: voItemId },
+        data: { 
+          actualProgress: percentage,
+          actualVolume: volume || undefined 
+        }
+      })
+    }
+
+    await tx.progressUpdate.create({
       data: {
         costItemId,
+        voItemId,
         percentage,
         volume,
         weather,
@@ -52,7 +68,7 @@ export async function updateProgress(formData: FormData) {
         staffName: staffName // This is the Mandor name
       }
     })
-  ])
+  })
 
   revalidatePath('/progress')
 }
@@ -68,6 +84,7 @@ export async function deleteProgress(updateId: number) {
   if (!updateToDelete) throw new Error("Update not found")
 
   const costItemId = updateToDelete.costItemId
+  const voItemId = updateToDelete.voItemId
 
   await prisma.$transaction(async (tx) => {
     // Delete the update
@@ -77,18 +94,28 @@ export async function deleteProgress(updateId: number) {
 
     // Find the newest remaining update to restore state
     const lastUpdate = await tx.progressUpdate.findFirst({
-      where: { costItemId },
+      where: costItemId ? { costItemId } : { voItemId },
       orderBy: { updateDate: 'desc' }
     })
 
-    // Update the costItem with the values from the previous record (or 0 if none left)
-    await tx.costItem.update({
-      where: { id: costItemId },
-      data: {
-        actualProgress: lastUpdate ? lastUpdate.percentage : 0,
-        actualVolume: lastUpdate ? lastUpdate.volume || 0 : 0
-      }
-    })
+    // Update the record with the values from the previous record (or 0 if none left)
+    if (costItemId) {
+      await tx.costItem.update({
+        where: { id: costItemId },
+        data: {
+          actualProgress: lastUpdate ? lastUpdate.percentage : 0,
+          actualVolume: lastUpdate ? lastUpdate.volume || 0 : 0
+        }
+      })
+    } else if (voItemId) {
+      await tx.vOItem.update({
+        where: { id: voItemId },
+        data: {
+          actualProgress: lastUpdate ? lastUpdate.percentage : 0,
+          actualVolume: lastUpdate ? lastUpdate.volume || 0 : 0
+        }
+      })
+    }
   })
 
   revalidatePath('/progress')
