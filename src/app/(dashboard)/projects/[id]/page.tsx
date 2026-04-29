@@ -198,8 +198,8 @@ export default async function ProjectDetails({
             <span style={{ color: 'var(--text-muted)' }}>RAB Estimate</span>
             <span style={{ fontWeight: 700, color: isEstimateOverBudget ? 'var(--error)' : 'inherit' }}>Rp {estimateTotal.toLocaleString('id-ID')}</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.85rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Actual Realized</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Financial Realization</span>
             <span style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>Rp {realizedTotal.toLocaleString('id-ID')}</span>
           </div>
           
@@ -215,6 +215,32 @@ export default async function ProjectDetails({
             <span>Realization vs Estimate</span>
             <span>{realizationPercentage.toFixed(1)}%</span>
           </div>
+
+          {/* Physical Progress */}
+          {(() => {
+            const totalItems = project.items.length;
+            if (totalItems === 0) return null;
+            const weightedSum = project.items.reduce((sum, item) => sum + (Number(item.actualProgress) / 100 * Number(item.totalPrice)), 0);
+            const totalEstimate = project.items.reduce((sum, item) => sum + Number(item.totalPrice), 0) || 1;
+            const physicalProgress = (weightedSum / totalEstimate) * 100;
+            
+            return (
+              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Physical Completion</span>
+                  <span style={{ fontWeight: 700, color: 'var(--success)' }}>{physicalProgress.toFixed(1)}%</span>
+                </div>
+                <div style={{ height: '8px', background: 'var(--bg-tertiary)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ 
+                    position: 'absolute', left: 0, top: 0, bottom: 0, 
+                    width: `${physicalProgress}%`, 
+                    background: 'var(--success)',
+                    transition: 'width 0.3s ease'
+                  }}></div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -257,6 +283,7 @@ export default async function ProjectDetails({
                 <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', textAlign: 'right', width: '120px' }}>Unit Price (Rp)</th>
                 <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', textAlign: 'right', width: '130px' }}>Estimate (Rp)</th>
                 <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', textAlign: 'right', width: '130px' }}>Realized (Rp)</th>
+                <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', textAlign: 'center', width: '110px' }}>Progress</th>
                 <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', textAlign: 'center', width: '100px' }}>Action</th>
               </tr>
             </thead>
@@ -291,6 +318,18 @@ export default async function ProjectDetails({
                       <td style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>{itemEstimate.toLocaleString('id-ID')}</td>
                       <td style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: isOver ? 'var(--error)' : 'var(--accent-primary)' }}>
                         {itemRealized > 0 ? itemRealized.toLocaleString('id-ID') : '-'}
+                      </td>
+                      <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
+                        <Link href="/progress" title="Update Progress" style={{ textDecoration: 'none' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center' }}>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>
+                              {Number(item.actualProgress).toFixed(1)}%
+                            </div>
+                            <div style={{ width: '60px', height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${item.actualProgress}%`, height: '100%', background: Number(item.actualProgress) >= 100 ? 'var(--success)' : 'var(--accent-primary)' }}></div>
+                            </div>
+                          </div>
+                        </Link>
                       </td>
                       <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
