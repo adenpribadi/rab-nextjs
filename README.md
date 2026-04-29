@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RAB & ERP Project Management System
 
-## Getting Started
+Sistem manajemen proyek dan penyusunan Rencana Anggaran Biaya (RAB) yang komprehensif, dirancang untuk efisiensi operasional dan transparansi keuangan proyek Anda.
 
-First, run the development server:
+![Dashboard Preview](public/dashboard-preview.png) *(Opsional: Silakan tambahkan screenshot dashboard di sini)*
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Keunggulan Utama
+
+Aplikasi ini tidak hanya sekadar pencatatan, melainkan solusi ERP (Enterprise Resource Planning) ringan yang berfokus pada ketepatan biaya:
+
+*   **Monitoring Budget Real-Time**: Lacak selisih antara anggaran rencana (Budget Ceiling) dengan pengeluaran aktual secara instan. Fitur deteksi otomatis **OVERBUDGET** membantu Anda mengantisipasi kerugian lebih awal.
+*   **Manajemen Inventori Terintegrasi**: Pantau stok material, pergerakan barang (Masuk/Keluar), hingga peringatan stok minimum dalam satu platform.
+*   **Digitalized Approval Workflow**: Tinggalkan tumpukan kertas. Verifikasi pengeluaran dan unggah bukti kuitansi secara digital dengan sistem persetujuan bertingkat (Pending/Approved/Rejected).
+*   **Analitik Visual yang Informatif**: Dilengkapi dengan dashboard interaktif menggunakan grafik performa biaya untuk memudahkan pengambilan keputusan strategis.
+*   **Arsitektur Modern**: Dibangun di atas stack teknologi terbaru untuk menjamin kecepatan, keamanan, dan skalabilitas.
+
+## 🛠️ Tech Stack
+
+Kami menggunakan teknologi terkini untuk memberikan pengalaman pengguna yang responsif dan performa tinggi:
+
+*   **Frontend**: [Next.js 16](https://nextjs.org/) (App Router) & [React 19](https://react.dev/)
+*   **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & Modern Vanilla CSS Variables
+*   **Database & ORM**: [MySQL](https://www.mysql.com/) dengan [Prisma ORM](https://www.prisma.io/)
+*   **Authentication**: [NextAuth.js v5 Beta](https://next-auth.js.org/) (Auth.js)
+*   **Data Visualization**: [Recharts](https://recharts.org/)
+*   **Processing**: [XLSX](https://github.com/SheetJS/sheetjs) (Excel Export/Import)
+*   **Security**: Bcryptjs untuk enkripsi data sensitif
+
+## 🚀 Fitur Utama
+
+Aplikasi ini mencakup modul-modul penting untuk operasional bisnis:
+
+1.  **Dashboard Utama**: Ringkasan performa proyek, estimasi Gross Margin, dan aktivitas terbaru.
+2.  **Manajemen Proyek**: Database proyek lengkap dengan detail klien, lokasi, dan item pekerjaan.
+3.  **Manajemen Biaya (RAB)**: Penyusunan item biaya per kategori (Material, Upah, Alat, dll).
+4.  **Kontrol Inventori**: Katalog material, satuan unit, dan log pergerakan stok.
+5.  **Sistem Pengeluaran & Kas**: Pencatatan biaya harian lengkap dengan upload bukti fisik.
+6.  **Approval System**: Antarmuka khusus untuk admin/manajer menyetujui atau menolak klaim biaya.
+7.  **Database Relasional**: Manajemen Klien dan Supplier (Vendor) yang terorganisir.
+8.  **Timeline Proyek**: Visualisasi jadwal pelaksanaan proyek.
+
+## ⚙️ Persiapan & Instalasi
+
+### 1. Prasyarat
+*   Node.js 20+
+*   MySQL Database
+
+### 2. Konfigurasi Environment
+Buat file `.env` di root direktori:
+```env
+DATABASE_URL="mysql://username:password@localhost:3306/nama_database"
+AUTH_SECRET="your-secret-key"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Instalasi
+```bash
+# Install dependensi
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Setup database (Prisma)
+npx prisma generate
+npx prisma db push
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Jalankan seeder (Optional - untuk data awal)
+npm run seed
+```
 
-## Learn More
+### 4. Jalankan Aplikasi
+```bash
+npm run dev
+```
+Buka [http://localhost:3001](http://localhost:3001) di browser Anda.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**RAB-ERP** — *Membangun dengan data, mengelola dengan presisi.*
