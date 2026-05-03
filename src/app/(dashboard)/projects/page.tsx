@@ -70,8 +70,8 @@ export default async function ProjectsPage({
           </div>
         </form>
 
-        <div style={{ overflowX: 'auto', flex: 1 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+        <div className="table-responsive-wrapper" style={{ overflowX: 'auto', flex: 1 }}>
+          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
             <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '2px solid var(--border-color)' }}>
               <tr>
                 <th style={{ padding: '0.75rem 1.5rem', fontWeight: 600, color: 'var(--text-muted)' }}>Project ID</th>
@@ -93,10 +93,10 @@ export default async function ProjectsPage({
               ) : (
                 projects.map((project, index) => (
                   <tr key={project.id} style={{ borderBottom: '1px solid var(--border-color)', background: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)', transition: 'background 0.2s' }} className="table-row-hover">
-                    <td style={{ padding: '0.75rem 1.5rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    <td data-label="Project ID" style={{ padding: '0.75rem 1.5rem', color: 'var(--text-muted)', fontWeight: 500 }}>
                       PROJ-{project.id.toString().padStart(4, '0')}
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem' }}>
+                    <td data-label="Name & Client" style={{ padding: '0.75rem 1.5rem' }}>
                       <Link href={`/projects/${project.id}`} style={{ fontWeight: 600, color: 'var(--accent-primary)', textDecoration: 'none' }}>
                         {project.name}
                       </Link>
@@ -104,16 +104,16 @@ export default async function ProjectsPage({
                         {project.clientName || 'No Client Assigned'}
                       </div>
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)' }}>
+                    <td data-label="Location" style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)' }}>
                       {project.location || '-'}
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)' }}>
+                    <td data-label="Timeline" style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)' }}>
                       {project.startDate ? project.startDate.toLocaleDateString('id-ID') : 'TBD'}
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem', textAlign: 'right', fontWeight: 600 }}>
+                    <td data-label="Budget" style={{ padding: '0.75rem 1.5rem', textAlign: 'right', fontWeight: 600 }}>
                       Rp {Number(project.budget).toLocaleString('id-ID')}
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem', textAlign: 'center' }}>
+                    <td data-label="Status" style={{ padding: '0.75rem 1.5rem', textAlign: 'center' }}>
                       <span style={{ 
                         background: project.status === 'COMPLETED' ? 'rgba(16, 185, 129, 0.15)' : project.status === 'IN_PROGRESS' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(245, 158, 11, 0.15)', 
                         color: project.status === 'COMPLETED' ? 'var(--success)' : project.status === 'IN_PROGRESS' ? 'var(--accent-primary)' : 'var(--warning)', 
@@ -126,7 +126,7 @@ export default async function ProjectsPage({
                         {project.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td style={{ padding: '0.75rem 1.5rem', textAlign: 'center' }}>
+                    <td data-label="Action" style={{ padding: '0.75rem 1.5rem', textAlign: 'center' }}>
                       <Link href={`/projects/${project.id}`} style={{ padding: '0.3rem 0.75rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-primary)', textDecoration: 'none' }}>
                         Open
                       </Link>

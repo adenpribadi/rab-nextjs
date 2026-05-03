@@ -69,7 +69,7 @@ export default function ExportButtons({ project, estimateTotal, realizedTotal }:
   };
 
   return (
-    <div style={{ display: 'flex', gap: '0.5rem' }} className="no-print">
+    <div className="project-action-grid no-print">
       <button 
         onClick={handleExportExcel} 
         style={{ 

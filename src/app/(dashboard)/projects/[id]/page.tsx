@@ -169,11 +169,11 @@ export default async function ProjectDetails({
             {project.status.replace('_', ' ')}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="project-action-grid">
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             ID: PROJ-{project.id.toString().padStart(4, '0')}
           </div>
-          <Link href={`/projects/${project.id}/edit`} className="btn-primary" style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', boxShadow: 'none' }}>
+          <Link href={`/projects/${project.id}/edit`} className="btn-primary" style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', boxShadow: 'none', display: 'flex', alignItems: 'center' }}>
             <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ marginRight: '0.25rem' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
@@ -203,14 +203,14 @@ export default async function ProjectDetails({
         
         {/* Info Grid */}
         <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '1rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', fontSize: '0.85rem' }}>
+          <div className="info-grid-detail" style={{ fontSize: '0.85rem' }}>
             <div>
               <div style={{ color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Client / Owner</div>
               <div style={{ fontWeight: 600 }}>{project.clientName || '-'}</div>
             </div>
             <div>
               <div style={{ color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Location</div>
-              <div style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{project.location || '-'}</div>
+              <div style={{ fontWeight: 600 }}>{project.location || '-'}</div>
             </div>
             <div>
               <div style={{ color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Timeline</div>
@@ -309,9 +309,9 @@ export default async function ProjectDetails({
 
       {/* Main RAB Items Table Area */}
       <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-        <div className="mobile-header-wrap" style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="mobile-header-wrap" style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0 }}>Bill of Quantities (BoQ) / RAB Items</h2>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="project-action-grid" style={{ display: 'flex', gap: '0.5rem' }}>
             <ExportButtons 
               project={{ 
                 id: project.id,
@@ -337,7 +337,7 @@ export default async function ProjectDetails({
         </div>
 
         <div style={{ overflowX: 'auto', flex: 1 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
             <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '2px solid var(--border-color)' }}>
               <tr>
                 <th style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--text-muted)', width: '40px' }}>No</th>
@@ -355,7 +355,7 @@ export default async function ProjectDetails({
             <tbody>
               {project.items.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     No cost items found. Add a new item below to start building the RAB.
                   </td>
                 </tr>
@@ -367,24 +367,24 @@ export default async function ProjectDetails({
                   
                   return (
                     <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)', background: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                      <td style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)' }}>{index + 1}</td>
-                      <td style={{ padding: '0.5rem 1rem' }}>
+                      <td data-label="No" style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)' }}>{index + 1}</td>
+                      <td data-label="Work Category" style={{ padding: '0.5rem 1rem' }}>
                         <span style={{ background: 'var(--bg-tertiary)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', border: '1px solid var(--border-color)' }}>
                           {item.category.name}
                         </span>
                       </td>
-                      <td style={{ padding: '0.5rem 1rem' }}>
+                      <td data-label="Item Description" style={{ padding: '0.5rem 1rem' }}>
                         <div style={{ fontWeight: 500 }}>{item.name}</div>
                         {item.description && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{item.description}</div>}
                       </td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 500 }}>{Number(item.quantity)}</td>
-                      <td style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)' }}>{item.unit}</td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'right' }}>{Number(item.unitPrice).toLocaleString('id-ID')}</td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>{itemEstimate.toLocaleString('id-ID')}</td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: isOver ? 'var(--error)' : 'var(--accent-primary)' }}>
+                      <td data-label="Qty" style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 500 }}>{Number(item.quantity)}</td>
+                      <td data-label="Unit" style={{ padding: '0.5rem 1rem', color: 'var(--text-muted)' }}>{item.unit}</td>
+                      <td data-label="Unit Price (Rp)" style={{ padding: '0.5rem 1rem', textAlign: 'right' }}>{Number(item.unitPrice).toLocaleString('id-ID')}</td>
+                      <td data-label="Estimate (Rp)" style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: 'var(--text-primary)' }}>{itemEstimate.toLocaleString('id-ID')}</td>
+                      <td data-label="Realized (Rp)" style={{ padding: '0.5rem 1rem', textAlign: 'right', fontWeight: 600, color: isOver ? 'var(--error)' : 'var(--accent-primary)' }}>
                         {itemRealized > 0 ? itemRealized.toLocaleString('id-ID') : '-'}
                       </td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
+                      <td data-label="Progress" style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
                         {project.status === 'PLANNING' ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'center', opacity: 0.5, cursor: 'not-allowed' }} title="Start project to update progress">
                             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
@@ -407,7 +407,7 @@ export default async function ProjectDetails({
                           </Link>
                         )}
                       </td>
-                      <td style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
+                      <td data-label="Action" style={{ padding: '0.5rem 1rem', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                           {project.status === 'PLANNING' ? (
                             <div style={{ color: 'var(--text-muted)', opacity: 0.3, cursor: 'not-allowed' }} title="Start project to input expenses">
