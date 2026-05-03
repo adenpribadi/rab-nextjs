@@ -79,36 +79,46 @@ export default function InventoryClient({
 
       <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
         {/* Toolbar */}
-        <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <input
-            type="text"
-            placeholder="Search material..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0.4rem 0.75rem', fontSize: '0.85rem', color: 'var(--text-primary)', width: '250px', outline: 'none' }}
-          />
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {(['all', 'low', 'ok'] as const).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                style={{
-                  padding: '0.35rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 600,
-                  background: filter === f ? 'var(--accent-primary)' : 'var(--bg-primary)',
-                  color: filter === f ? 'white' : 'var(--text-muted)',
-                  border: `1px solid ${filter === f ? 'var(--accent-primary)' : 'var(--border-color)'}`
-                }}
-              >
-                {f === 'all' ? 'All' : f === 'low' ? '⚠ Low Stock' : '✓ OK'}
-              </button>
-            ))}
+        <div className="responsive-filter-bar" style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)' }}>
+          <div className="filter-inputs" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flex: '1 1 100%' }}>
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--text-muted)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search material..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.6rem 0.75rem 0.6rem 2.25rem', fontSize: '0.85rem', color: 'var(--text-primary)', width: '100%', outline: 'none' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem', flex: '1 1 auto' }}>
+              {(['all', 'low', 'ok'] as const).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  style={{
+                    flex: 1, padding: '0.5rem', fontSize: '0.75rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 600,
+                    background: filter === f ? 'var(--accent-primary)' : 'var(--bg-primary)',
+                    color: filter === f ? 'white' : 'var(--text-muted)',
+                    border: `1px solid ${filter === f ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {f === 'all' ? 'All' : f === 'low' ? '⚠ Low' : '✓ OK'}
+                </button>
+              ))}
+            </div>
           </div>
-          <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{filtered.length} items</span>
+          <div style={{ marginTop: '0.75rem', fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            Showing {filtered.length} materials
+          </div>
         </div>
 
         {/* Table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+        <div className="table-responsive-wrapper" style={{ overflowX: 'auto' }}>
+          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
             <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '2px solid var(--border-color)' }}>
               <tr>
                 <th style={{ padding: '0.6rem 1rem', fontWeight: 600, color: 'var(--text-muted)' }}>Material Name</th>
@@ -133,30 +143,30 @@ export default function InventoryClient({
                 const stockValue = m.currentStock * m.unitPrice
                 return (
                   <tr key={m.id} style={{ borderBottom: '1px solid var(--border-color)', background: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                    <td style={{ padding: '0.6rem 1rem', fontWeight: 500 }}>{m.name}</td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>{m.unit}</td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'right' }}>Rp {m.unitPrice.toLocaleString('id-ID')}</td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'center', fontWeight: 700, fontSize: '1rem', color: m.currentStock === 0 ? 'var(--error)' : 'var(--text-primary)' }}>
+                    <td data-label="Material Name" style={{ padding: '0.6rem 1rem', fontWeight: 500 }}>{m.name}</td>
+                    <td data-label="Unit" style={{ padding: '0.6rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>{m.unit}</td>
+                    <td data-label="Unit Price" style={{ padding: '0.6rem 1rem', textAlign: 'right' }}>Rp {m.unitPrice.toLocaleString('id-ID')}</td>
+                    <td data-label="Current Stock" style={{ padding: '0.6rem 1rem', textAlign: 'center', fontWeight: 700, fontSize: '1rem', color: m.currentStock === 0 ? 'var(--error)' : 'var(--text-primary)' }}>
                       {Number(m.currentStock).toLocaleString('id-ID')}
                     </td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <td data-label="Min Stock" style={{ padding: '0.6rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                       {m.minStock > 0 ? Number(m.minStock).toLocaleString('id-ID') : '-'}
                     </td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'right', fontWeight: 500 }}>
+                    <td data-label="Stock Value" style={{ padding: '0.6rem 1rem', textAlign: 'right', fontWeight: 500 }}>
                       {stockValue > 0 ? `Rp ${stockValue.toLocaleString('id-ID')}` : '-'}
                     </td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'center' }}>
+                    <td data-label="Status" style={{ padding: '0.6rem 1rem', textAlign: 'center' }}>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '4px', background: status.bg, color: status.color }}>
                         {status.label}
                       </span>
                     </td>
-                    <td style={{ padding: '0.6rem 1rem', textAlign: 'center' }}>
+                    <td data-label="Action" style={{ padding: '0.6rem 1rem', textAlign: 'center' }}>
                       <button
                         onClick={() => setSelectedMaterial(m)}
                         style={{
-                          padding: '0.3rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px', cursor: 'pointer',
+                          padding: '0.4rem 1rem', fontSize: '0.75rem', borderRadius: '4px', cursor: 'pointer',
                           background: 'rgba(59,130,246,0.1)', color: 'var(--accent-primary)',
-                          border: '1px solid rgba(59,130,246,0.3)', fontWeight: 500
+                          border: '1px solid rgba(59,130,246,0.3)', fontWeight: 600, width: '100%'
                         }}
                       >
                         Manage Stock
@@ -186,7 +196,7 @@ export default function InventoryClient({
             </div>
 
             {/* Stock info bar */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
               <div style={{ background: 'var(--bg-tertiary)', padding: '0.75rem', borderRadius: '6px', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Current Stock</div>
                 <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>{Number(selectedMaterial.currentStock).toLocaleString('id-ID')} {selectedMaterial.unit}</div>

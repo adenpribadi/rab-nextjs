@@ -41,14 +41,14 @@ export default async function TimelinePage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>Project Timeline</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.25rem 0 0' }}>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Project Timeline</h1>
+          <p className="page-subtitle" style={{ fontSize: '0.85rem' }}>
             Visual Gantt chart overview of all project schedules and progress.
           </p>
         </div>
-        <Link href="/projects/new" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Link href="/projects/new" className="btn-primary" style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>

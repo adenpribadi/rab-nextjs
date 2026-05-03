@@ -39,3 +39,23 @@ export async function deleteCategory(formData: FormData) {
 
   revalidatePath('/categories');
 }
+
+export async function updateCategory(formData: FormData) {
+  const id = parseInt(formData.get('id') as string);
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+
+  if (!id || !name) {
+    throw new Error('ID and name are required');
+  }
+
+  await prisma.category.update({
+    where: { id },
+    data: {
+      name,
+      description: description || null,
+    },
+  });
+
+  revalidatePath('/categories');
+}

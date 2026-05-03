@@ -5,12 +5,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { logoutAction } from "@/app/actions/auth";
 import { useSession } from "next-auth/react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [pendingCount, setPendingCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const isAdmin = (session?.user as any)?.role === 'ADMIN';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch pending approval count for admins
   useEffect(() => {
@@ -31,7 +38,7 @@ export function Sidebar() {
 
   return (
     <aside className="erp-sidebar">
-      <div className="sidebar-logo" style={{ height: '4.5rem', display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="sidebar-logo">
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
           <div style={{
             background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
@@ -94,7 +101,7 @@ export function Sidebar() {
           Inventory
         </Link>
 
-        {isAdmin && (
+        {mounted && isAdmin && (
           <Link href="/approvals" className={`sidebar-link ${pathname && pathname.startsWith('/approvals') ? 'active' : ''}`} style={{ position: 'relative' }}>
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -157,7 +164,7 @@ export function Sidebar() {
           System Online
         </div>
         <button
-          onClick={() => logoutAction()}
+          onClick={() => router.push('/logout')}
           className="sidebar-link"
           style={{
             width: '100%',
@@ -185,6 +192,12 @@ export function Topbar() {
   const router = useRouter();
   const { data: session } = useSession();
   const [search, setSearch] = useState('');
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const user = session?.user as any;
   const displayName = user?.name || user?.username || "Admin User";
@@ -198,7 +211,7 @@ export function Topbar() {
   };
 
   return (
-    <header className="topbar-header" style={{ height: '3.5rem', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', padding: '0 1.5rem', gap: '1rem', justifyContent: 'flex-end', flexShrink: 0 }}>
+    <header className="topbar-header">
       <div className="mobile-logo" style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }}>
         <div style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', width: '24px', height: '24px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
@@ -211,24 +224,148 @@ export function Topbar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
+          id="topbar-search"
           type="text"
           placeholder="Search projects..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleSearch}
           style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '0.8rem', width: '150px', outline: 'none' }}
+          suppressHydrationWarning
         />
       </div>
 
-      <div className="topbar-user" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '1px solid var(--border-color)' }}>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{displayRole}</div>
-        </div>
-        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary))', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'var(--accent-primary)', fontSize: '0.9rem' }}>
-          {initials}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <ThemeToggle />
+        
+        <div 
+          onClick={() => setShowUserModal(true)}
+          className="topbar-user" 
+          style={{ 
+            display: 'flex', alignItems: 'center', gap: '0.75rem', 
+            paddingLeft: '1rem', borderLeft: '1px solid var(--border-color)', 
+            visibility: mounted ? 'visible' : 'hidden', cursor: 'pointer' 
+          }}
+        >
+          <div style={{ textAlign: 'right' }} className="desktop-only-text">
+            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>{mounted ? displayName : '...'}</div>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{mounted ? displayRole : '...'}</div>
+          </div>
+          <div style={{ 
+            width: '36px', height: '36px', borderRadius: '10px', 
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            fontWeight: 'bold', color: 'white', fontSize: '0.9rem',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
+          }}>
+            {mounted ? initials : ''}
+          </div>
         </div>
       </div>
+
+      {/* User Info & Quick Links Modal */}
+      {showUserModal && (
+        <div 
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setShowUserModal(false)}
+          style={{ 
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', 
+            backdropFilter: 'blur(8px)', display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', zIndex: 2000,
+            padding: '1rem'
+          }}
+        >
+          <div 
+            className="glass-card animate-in" 
+            style={{ 
+              width: '100%', maxWidth: '400px', borderRadius: '20px', 
+              padding: '2rem', background: 'var(--bg-secondary)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+              border: '1px solid var(--border-highlight)'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ 
+                width: '72px', height: '72px', borderRadius: '20px', 
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                fontSize: '1.8rem', fontWeight: 'bold', color: 'white', 
+                margin: '0 auto 1rem', boxShadow: 'var(--shadow-lg)' 
+              }}>
+                {initials}
+              </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.25rem 0' }}>{displayName}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>{displayRole}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', marginTop: '0.5rem', fontWeight: 500 }}>{session?.user?.email}</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <Link href="/clients" onClick={() => setShowUserModal(false)} className="profile-menu-item">
+                <span style={{ fontSize: '1.2rem' }}>👥</span>
+                <span>Clients</span>
+              </Link>
+              <Link href="/categories" onClick={() => setShowUserModal(false)} className="profile-menu-item">
+                <span style={{ fontSize: '1.2rem' }}>📁</span>
+                <span>Categories</span>
+              </Link>
+              <Link href="/materials" onClick={() => setShowUserModal(false)} className="profile-menu-item">
+                <span style={{ fontSize: '1.2rem' }}>📦</span>
+                <span>Materials</span>
+              </Link>
+              <Link href="/settings" onClick={() => setShowUserModal(false)} className="profile-menu-item">
+                <span style={{ fontSize: '1.2rem' }}>⚙️</span>
+                <span>Settings</span>
+              </Link>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button 
+                onClick={() => setShowUserModal(false)}
+                style={{ flex: 1, padding: '0.85rem', borderRadius: '12px', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', fontWeight: 600, border: '1px solid var(--border-color)' }}
+              >
+                Close
+              </button>
+              <button 
+                onClick={() => router.push('/logout')}
+                style={{ flex: 1, padding: '0.85rem', borderRadius: '12px', background: 'var(--error)', color: 'white', fontWeight: 600, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)' }}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+          <style jsx>{`
+            .profile-menu-item {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 1rem;
+              background: var(--bg-tertiary);
+              border-radius: 16px;
+              text-decoration: none;
+              transition: all 0.2s ease;
+              border: 1px solid var(--border-color);
+            }
+            .profile-menu-item:hover {
+              background: var(--bg-primary);
+              border-color: var(--accent-primary);
+              transform: translateY(-2px);
+            }
+            .profile-menu-item span:last-child {
+              font-size: 0.75rem;
+              font-weight: 600;
+              color: var(--text-primary);
+            }
+            .animate-in {
+              animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes modalIn {
+              from { opacity: 0; transform: scale(0.95) translateY(10px); }
+              to { opacity: 1; transform: scale(1) translateY(0); }
+            }
+          `}</style>
+        </div>
+      )}
     </header>
   );
 }

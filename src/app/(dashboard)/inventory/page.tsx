@@ -45,10 +45,10 @@ export default async function InventoryPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>Inventory & Stock</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.25rem 0 0' }}>
+          <h1 className="page-title" style={{ fontSize: '1.5rem' }}>Inventory & Stock</h1>
+          <p className="page-subtitle" style={{ fontSize: '0.85rem' }}>
             Track material stock levels, receive new stock, and monitor usage.
           </p>
         </div>

@@ -54,28 +54,28 @@ export default function GanttChart({ projects }: { projects: GanttProject[] }) {
   }
 
   return (
-    <div className="glass-card" style={{ padding: '1.5rem', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+    <div className="glass-card gantt-container" style={{ padding: '1.5rem', overflow: 'hidden' }}>
+      <div className="gantt-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
         <h2 style={{ fontSize: '1rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--accent-primary)">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Gantt Chart — Project Schedule Overview
+          Gantt Chart
         </h2>
-        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.7rem', flexWrap: 'wrap' }}>
           {Object.entries(STATUS_COLOR).map(([status, c]) => (
             <span key={status} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: c.text }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: c.bar, display: 'inline-block' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: c.bar, display: 'inline-block' }} />
               {status.replace('_', ' ')}
             </span>
           ))}
         </div>
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
-        <div style={{ minWidth: '700px' }}>
+      <div style={{ overflowX: 'auto', paddingBottom: '1rem' }} className="gantt-scroll-area">
+        <div style={{ minWidth: '800px' }}>
           {/* Month header */}
-          <div style={{ display: 'flex', marginBottom: '0.5rem', paddingLeft: '240px', position: 'relative', height: '24px' }}>
+          <div className="gantt-month-header" style={{ display: 'flex', marginBottom: '0.5rem', paddingLeft: '180px', position: 'relative', height: '24px' }}>
             <div style={{ position: 'relative', flex: 1 }}>
               {months.map((m, i) => (
                 <div
@@ -84,7 +84,7 @@ export default function GanttChart({ projects }: { projects: GanttProject[] }) {
                     position: 'absolute',
                     left: `${m.leftPct}%`,
                     width: `${m.widthPct}%`,
-                    fontSize: '0.7rem',
+                    fontSize: '0.65rem',
                     color: 'var(--text-muted)',
                     borderLeft: '1px solid var(--border-color)',
                     paddingLeft: '4px',
@@ -111,19 +111,19 @@ export default function GanttChart({ projects }: { projects: GanttProject[] }) {
               const isOverdue = p.status !== 'COMPLETED' && new Date(p.endDate!) < today
 
               return (
-                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '0', height: '44px' }}>
+                <div key={p.id} className="gantt-row" style={{ display: 'flex', alignItems: 'center', gap: '0', height: '40px' }}>
                   {/* Project label */}
-                  <div style={{ width: '240px', flexShrink: 0, paddingRight: '1rem', overflow: 'hidden' }}>
+                  <div className="gantt-label" style={{ width: '180px', flexShrink: 0, paddingRight: '1rem', overflow: 'hidden' }}>
                     <Link
                       href={`/projects/${p.id}`}
                       style={{ textDecoration: 'none', display: 'block' }}
                     >
-                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {p.name}
                       </div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                        <span>{p.clientName || 'No client'}</span>
-                        {isOverdue && <span style={{ color: '#ef4444', fontWeight: 600 }}>OVERDUE</span>}
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.clientName || 'No client'}</span>
+                        {isOverdue && <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.6rem' }}>!</span>}
                       </div>
                     </Link>
                   </div>
@@ -196,7 +196,7 @@ export default function GanttChart({ projects }: { projects: GanttProject[] }) {
         </div>
       </div>
 
-      <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '2rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+      <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
         <span>📅 Range: {minDate.toLocaleDateString('id-ID')} — {maxDate.toLocaleDateString('id-ID')}</span>
         <span>📊 {validProjects.length} projects with timeline</span>
         <span style={{ color: '#ef4444' }}>— Today indicator</span>
